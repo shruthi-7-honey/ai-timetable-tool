@@ -1,31 +1,41 @@
-import streamlit as st
-from PIL import Image
-import pytesseract
-
-st.set_page_config(page_title="AI Timetable Planner", layout="wide")
-st.title("📅 AI Timetable & Daily Routine Generator")
-st.markdown("Upload your class timetable image, and we’ll read it!")
-
-uploaded_file = st.file_uploader("Upload timetable image", type=["png", "jpg", "jpeg"])
-
-if uploaded_file:
-    img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Timetable", use_column_width=True)
-
-    # OCR to extract text
+       # OCR to extract text
     extracted_text = pytesseract.image_to_string(img)
     
-    st.subheader("📄 Extracted Timetable Text:")
+    st.subheader("📄 Raw Extracted Timetable:")
     st.code(extracted_text)
 
+    # 🧼 Clean the messy text
+    def clean_text(text):
+        lines = text.splitlines()
+        useful_lines = []
+
+        for line in lines:
+            line = line.strip()
+            if line == "" or line.lower() in ["sec", "vac"]:
+                continue
+            if any(char.isdigit() for char in line) and len(line) > 4:
+                useful_lines.append(line)
+        
+        return useful_lines
+
+    cleaned_lines = clean_text(extracted_text)
+
+    st.subheader("🧹 Cleaned Timetable Lines:")
+    for line in cleaned_lines:
+        st.markdown(f"- {line}")
+
+    # 🧠 Dummy Routine based on cleaned lines
     if st.button("✨ Generate Smart Routine"):
-        st.success("Here’s your smart daily routine based on timetable:")
+        st.success("Here’s your AI-based day plan 📅:")
+        for i, line in enumerate(cleaned_lines):
+            st.markdown(f"**Class {i+1}:** {line}")
+        
         st.markdown("""
-        - ⏰ Wake Up: 6:30 AM  
-        - 🍽️ Breakfast: 7:00 AM  
-        - 📚 Classes: According to extracted timetable  
-        - 📖 Study Time: 5:00 PM  
-        - 🏋️ Gym/Yoga: 6:30 PM  
-        - 📱 Chill Time: 8:30 PM  
+        - 🧘 Gym/Yoga: 6:30 AM  
+        - 🍽️ Breakfast: 8:00 AM  
+        - 📚 Classes: As above  
+        - 📖 Study Time: 6:00 PM  
+        - 📱 Chill Time: 8:00 PM  
         - 😴 Sleep: 10:30 PM
         """)
+
