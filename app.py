@@ -1,4 +1,4 @@
-       # OCR to extract text
+    # OCR to extract text
     extracted_text = pytesseract.image_to_string(img)
     
     st.subheader("📄 Raw Extracted Timetable:")
@@ -38,4 +38,3 @@
         - 📱 Chill Time: 8:00 PM  
         - 😴 Sleep: 10:30 PM
         """)
-
